@@ -1,0 +1,289 @@
+/* Header and Topbar Styles */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.topbarContent {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #ffffff;
+  border-bottom: 0.5px solid #d0d0d0;
+  margin-bottom: 20px;
+}
+
+.topbarContent0 {
+  display: flex;
+  padding: 13px;
+  gap: 9px;
+  font-size: 20px;
+}
+
+.topbarContent1 {
+  display: flex;
+  padding: 10px;
+  gap: 9px;
+}
+
+/* Flex Containers */
+.flex1 {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.flex2 {
+  display: flex;
+  align-items: center;
+}
+
+.flex3 {
+  align-items: center;
+}
+
+/* Image Styles */
+.image {
+  display: flex;
+}
+
+.logo-img {
+  height: 56.05px;
+  width: fit-content;
+}
+
+.logo-img2 {
+  height: 45px;
+  width: 45px;
+  border-radius: 5px;
+}
+
+/* Icon and Button Styles */
+.iconContent3 {
+  background-color: #f5f5f5;
+  color: #919eab;
+  padding: 13px;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.logout-button {
+  width: 200px;
+  padding: 20px;
+  border: none !important;
+  border-radius: 5px !important;
+  color: #fff !important;
+  background-color: #919eab !important;
+  font-weight: bold;
+}
+
+.logout-button:hover{
+  color: #fff !important;
+  background-color: #616a73 !important;
+}
+
+/* Sidebar and Notification Styles */
+.notificationSidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  transition: transform 0.6s ease-in-out;
+  transform: translateX(0);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.notificationSidebar .closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #000;
+}
+
+.notificationSidebar .notificationContent {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.notificationSidebar .notificationItem {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notificationSidebar .notificationItem.read {
+  color: #888;
+}
+
+.notificationSidebar .notificationItem.unread {
+  font-weight: bold;
+}
+
+.notificationSidebar .deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Logout Container */
+.logout-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background-color: #213a4b;
+  border-radius: 10px;
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 40px;
+  padding: 20px;
+  width: 248px;
+  height: 130px;
+}
+
+.logoutContainer0 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.logoutContainer1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Additional Styles */
+.teamDetails {
+  color: #d2d2d2;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.menuItem{
+  padding: 15px !important;
+  margin-top:10px !important ;
+  border-radius: 5px !important;
+}
+
+.active-menu-item {
+  padding: 15px !important;
+  margin-top:10px !important ;
+  background-color: #069f7e !important;
+  color: #f2f5fc !important;
+  border-radius: 5px !important;
+}
+
+.barbody {
+  width: fit-content;
+  height: 100%;
+  padding: 15px;
+  background-color: #212b36;
+}
+
+/* Notification Icon Styles */
+.bellIconWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.notificationDot {
+  position: absolute;
+  top: 0px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: #ffab00;
+  border-radius: 50%;
+}
+.showSidebar {
+  display: none; 
+}
+
+
+/* Media Query for Mobile Screens */
+@media (max-width: 768px) {
+
+  .barbody {
+    display: none;
+  }
+
+  .barbody.show {
+    display: block;
+  }
+
+  .topbarContent {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    background-color: #ffffff;
+    border-bottom: 0.5px solid #d0d0d0;
+    height: auto;
+    width: 100%;
+  }
+
+  .topbarContent0 {
+    font-size: 20px;
+    text-align: left;
+  }
+
+  .flex1 {
+    justify-content: flex-end;
+  }
+
+  .flex2,
+  .flex3 {
+    display: none;
+  }
+
+  .bellIconWrapper {
+    position: static;
+    margin: 0;
+    width: fit-content;
+  }
+
+  .notificationDot {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+  }
+
+  .logo-img2 {
+    height: 35px;
+    width: 35px;
+    border-radius: 5px;
+  }
+
+  h3 {
+    font-size: 13px;
+  }
+
+  p {
+    font-size: 7px;
+  }
+
+  .showSidebar {
+    display: block;
+    cursor: pointer;
+  }
+}

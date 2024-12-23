@@ -1,0 +1,85 @@
+/* Existing styles */
+.authbody {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100vh !important;
+}
+
+.form-container {
+  width: 1000px !important;
+  padding: 20px;
+}
+
+.title,
+.slogan {
+  text-align: center !important;
+}
+
+.btn {
+  width: 100% !important;
+}
+
+.auth-img {
+  width: 100% !important;
+  height: 80% !important;
+  margin-top: 10% !important;
+  border-radius: 8px !important;
+}
+
+.auth-img-wrapper {
+  display: flex; /* Display flex by default on larger screens */
+}
+
+/* Media Queries for Responsive Design */
+@media screen and (max-width: 1024px) and (orientation: landscape),
+  screen and (max-width: 834px) and (orientation: portrait) {
+
+  .authbody {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .form-container {
+    width: 100% !important;
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 22px !important;
+  }
+
+  .slogan {
+    font-size: 14px !important;
+  }
+
+  .auth-img {
+    display: none;
+  }
+
+  .btn {
+    font-size: 14px;
+  }
+  .auth-img-wrapper {
+    display: none; /* Hide on screens smaller than 1024px */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .form-container {
+    width: 95% !important;
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 18px !important;
+  }
+
+  .slogan {
+    font-size: 12px !important;
+  }
+
+  .btn {
+    font-size: 12px;
+  }
+}

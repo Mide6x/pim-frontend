@@ -5,8 +5,10 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
+  faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import useSpeechRecognition from "../../hooks/useSpeechRecognition";
 
 const ManufacturerDetails = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const ManufacturerDetails = () => {
   const [loading, setLoading] = useState(true);
   const [isEditingManufacturer, setIsEditingManufacturer] = useState(false);
   const [brandsList, setBrandsList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchManufacturerDetails = async () => {
@@ -143,6 +146,13 @@ const ManufacturerDetails = () => {
     }
   };
 
+  const handleSpeechResult = (transcript) => {
+    setSearchTerm(transcript);
+    handleSearch(transcript);
+  };
+
+  const handleMicClick = useSpeechRecognition(handleSpeechResult);
+
   const columns = [
     {
       title: "Brand",
@@ -230,12 +240,29 @@ const ManufacturerDetails = () => {
               children: (
                 <div>
                   <div className="searchBarContainer">
-                    <Input
-                      placeholder="Search Brands by name"
-                      onChange={(e) => handleSearch(e.target.value)}
-                      style={{ width: "100%" }}
-                      className="searchBar"
-                    />
+                    <div className="searchBarWrapper" style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                      <Input
+                        placeholder="Search Brands by name"
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          handleSearch(e.target.value);
+                        }}
+                        style={{ width: "100%" }}
+                        className="searchBar"
+                      />
+                      <FontAwesomeIcon
+                        icon={faMicrophone}
+                        size="lg"
+                        style={{
+                          color: "#616a73",
+                          marginLeft: "-40px",
+                          zIndex: "3",
+                          cursor: "pointer",
+                        }}
+                        onClick={handleMicClick}
+                      />
+                    </div>
                     <Button
                       type="primary"
                       className="addBtn"

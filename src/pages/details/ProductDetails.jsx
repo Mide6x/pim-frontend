@@ -1,66 +1,81 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button,Flex, message, Modal, Form, Input } from "antd";
+import { Button,Flex, message, Modal, Form, Input, Tabs } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import { getProductDetailsFromOpenAI } from "../../hooks/useProductDescription";
+import useAuth from "../../contexts/useAuth";
+
+const { TabPane } = Tabs;
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { userData } = useAuth();
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState("true");
   const [isArchived, setIsArchived] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      setLoading(true);
+    const fetchProduct = async () => {
+      setLoading("true");
       try {
-        const response = await axios.get(
-          `/api/v1/products/${id}`
-        );
+        const response = await axios.get(`/api/v1/products/${id}`);
         setProduct(response.data);
+        setIsArchived(response.data.isArchived || false);
+        form.setFieldsValue(response.data);
       } catch (error) {
         message.error("Failed to fetch product details 😔");
       } finally {
-        setLoading(false);
+        setLoading("false");
       }
     };
 
-    fetchProductDetails();
-  }, [id]);
+    if (id) {
+      fetchProduct();
+    }
+  }, [id, form]);
 
   const handleEdit = () => {
     setIsModalVisible(true);
     form.setFieldsValue(product);
   };
 
-  const handleOk = async () => {
+  const handleSubmit = async (values) => {
     try {
-      const updatedProduct = await form.validateFields();
-      const productWithImage = { ...updatedProduct, imageUrl: product.imageUrl, createdBy: product.createdBy };
-      await axios.put(
-        `/api/v1/products/${id}`,
-        productWithImage
+      const response = await axios.put(
+        `/api/v1/products/${id}`, 
+        values,
+        {
+          headers: {
+            'user-email': userData.email
+          }
+        }
       );
-      setProduct(productWithImage);
-      message.success("Product updated successfully 🎉");
+      setProduct(response.data);
       setIsModalVisible(false);
+      message.success("Product updated successfully 🎉");
     } catch (error) {
+      console.error('Update error:', error);
       message.error("Failed to update product 😔");
     }
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
   const handleArchive = async () => {
     try {
-      await axios.patch(`/api/v1/products/archive/${id}`);
+      await axios.patch(
+        `/api/v1/products/archive/${id}`,
+        {},
+        {
+          headers: {
+            'user-email': userData.email
+          }
+        }
+      );
       setIsArchived(true);
       message.success("Product archived successfully 🎉");
     } catch (error) {
@@ -70,7 +85,15 @@ const ProductDetails = () => {
 
   const handleUnarchive = async () => {
     try {
-      await axios.patch(`/api/v1/products/unarchive/${id}`);
+      await axios.patch(
+        `/api/v1/products/unarchive/${id}`,
+        {},
+        {
+          headers: {
+            'user-email': userData.email
+          }
+        }
+      );
       setIsArchived(false);
       message.success("Product unarchived successfully 🎉");
     } catch (error) {
@@ -80,14 +103,51 @@ const ProductDetails = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/v1/products/${id}`);
+      await axios.delete(
+        `/api/v1/products/${id}`,
+        {
+          headers: {
+            'user-email': userData.email
+          }
+        }
+      );
       message.success("Product deleted successfully 🎉");
       navigate(-1);
     } catch (error) {
       message.error("Failed to delete product 😔");
     }
   };
-  
+
+  const handleGenerateDescription = async () => {
+    try {
+      const formValues = form.getFieldsValue();
+      console.log('Form values:', formValues);
+
+      if (!formValues.productName || !formValues.manufacturerName) {
+        message.warning('Please fill in at least the product name and manufacturer');
+        return;
+      }
+
+      message.loading('Generating description...', 0);
+
+      const description = await getProductDetailsFromOpenAI(formValues);
+      message.destroy();
+
+      console.log('Received description:', description);
+
+      if (description) {
+        form.setFieldValue('description', description);
+        message.success('Description generated successfully 🎉');
+      } else {
+        throw new Error('No description received');
+      }
+
+    } catch (error) {
+      message.destroy();
+      console.error('Generation error:', error);
+      message.error(error.message || 'Failed to generate description 😔');
+    }
+  };
 
   if (!product) {
     return   <Flex vertical flex={1} className="content">
@@ -185,70 +245,100 @@ const ProductDetails = () => {
       <Modal
         title="Edit Product Details"
         open={isModalVisible}
-        onCancel={handleCancel}
+        onCancel={() => setIsModalVisible(false)}
         footer={null}
       >
-        <Form form={form} onFinish={handleOk} >
-        <p className="formTitle">Product Name</p>
-          <Form.Item name="productName">
-            <Input className="userInput"  />
-          </Form.Item>
-          <p className="formTitle">Manufacturer</p>
-          <Form.Item name="manufacturerName">
-            <Input className="userInput"  />
-          </Form.Item>
-          <p className="formTitle">Product Brand</p>
-          <Form.Item name="brand">
-            <Input className="userInput"  />
-          </Form.Item>
-          <p className="formTitle">Product Category</p>
-          <Form.Item name="productCategory">
-            <Input className="userInput"  />
-          </Form.Item>
-          <p className="formTitle">Product Subcategory</p>
-          <Form.Item name="productSubcategory">
-            <Input className="userInput"  />
-          </Form.Item>
-          <p className="formTitle">Variant</p>
-          <Form.Item name="variant">
-            <Input className="userInput" />
-          </Form.Item>
-          <p className="formTitle">Variant Type</p>
-          <Form.Item name="variantType">
-            <Input className="userInput"  />
-          </Form.Item>
-          <p className="formTitle">Weight (in Kg)</p>
-          <Form.Item name="weight">
-            <Input className="userInput" suffix="Kg" onInput={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, '');
-            }} />
-          </Form.Item>
-          <p className="formTitle">Product Description</p>
-          <Form.Item
-            name="description"
-            rules={[{ required: false, message: "Enter the product details." }]}
-          >
-            <Input.TextArea
-              className="userInputDesc"
-              placeholder="Product Description"
-              autoSize={{ minRows: 3, maxRows: 6 }}
-            />
-          </Form.Item>
-          <Form.Item className="concludeBtns">
-            <Button
-              className="editBtn"
-              onClick={() => setIsModalVisible(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="addBtn"
-              htmlType="submit"
-              style={{ marginLeft: "10px" }}
-            >
-              Save
-            </Button>
-          </Form.Item>
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          initialValues={product}
+        >
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="Basic Details" key="1">
+              <div className="approval-image-preview">
+                <img 
+                  src={product.imageUrl}
+                  alt={product.productName}
+                  style={{ maxWidth: '200px', height: 'auto' }}
+                />
+              </div>
+              <p className="formTitle">Product Name</p>
+              <Form.Item name="productName">
+                <Input className="userInput" />
+              </Form.Item>
+              <p className="formTitle">Manufacturer</p>
+              <Form.Item name="manufacturerName">
+                <Input className="userInput" />
+              </Form.Item>
+              <p className="formTitle">Product Brand</p>
+              <Form.Item name="brand">
+                <Input className="userInput" />
+              </Form.Item>
+              <p className="formTitle">Product Category</p>
+              <Form.Item name="productCategory">
+                <Input className="userInput" />
+              </Form.Item>
+              <p className="formTitle">Product Subcategory</p>
+              <Form.Item name="productSubcategory">
+                <Input className="userInput" />
+              </Form.Item>
+            </TabPane>
+
+            <TabPane tab="Additional Details" key="2">
+              <p className="formTitle">Variant</p>
+              <Form.Item name="variant">
+                <Input className="userInput" />
+              </Form.Item>
+              <p className="formTitle">Variant Type</p>
+              <Form.Item name="variantType">
+                <Input className="userInput" />
+              </Form.Item>
+              <p className="formTitle">Weight (in Kg)</p>
+              <Form.Item name="weight">
+                <Input 
+                  className="userInput" 
+                  suffix="Kg" 
+                  onInput={(e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                  }} 
+                />
+              </Form.Item>
+              <p className="formTitle">Product Description</p>
+              <Form.Item
+                name="description"
+                rules={[{ required: false, message: "Enter the product details." }]}
+              >
+                <Input.TextArea
+                  className="userInputDesc"
+                  placeholder="Product Description"
+                  autoSize={{ minRows: 3, maxRows: 6 }}
+                />
+              </Form.Item>
+              <Form.Item className="concludeBtns">
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+                  <Button
+                    className="AIBtn"
+                    onClick={handleGenerateDescription}
+                    icon={<FontAwesomeIcon icon={faWandMagicSparkles} style={{ color: "#b76e00" }} />}
+                  >
+                    Generate AI Description
+                  </Button>
+                  <Button
+                    className="editBtn"
+                    onClick={() => setIsModalVisible(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="addBtn"
+                    htmlType="submit"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </Form.Item>
+            </TabPane>
+          </Tabs>
         </Form>
       </Modal>
     </Flex>

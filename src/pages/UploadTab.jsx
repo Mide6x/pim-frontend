@@ -3,7 +3,7 @@ import { Flex, Button, message, Table, Modal, Form } from "antd";
 import axios from "axios";
 import { categorizeProductWithOpenAI } from "../hooks/openaiCategorizer";
 import useAuth from "../contexts/useAuth";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const UploadTab = () => {
   const { userData } = useAuth();
@@ -14,6 +14,7 @@ const UploadTab = () => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.setItem("processedData", JSON.stringify(data));
@@ -176,6 +177,7 @@ const UploadTab = () => {
       localStorage.removeItem("processedData");
 
       setData([]);
+      navigate('/approval');
     } catch (error) {
       console.error(
         "Error sending data for approval or deleting processed images:",

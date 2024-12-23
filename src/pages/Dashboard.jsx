@@ -91,7 +91,11 @@ const Dashboard = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/v1/products/${id}`);
+      await axios.delete(`/api/v1/products/${id}`, {
+        headers: {
+          'user-email': userData.email
+        }
+      });
       message.success("Product deleted successfully 🎉");
       fetchProducts();
     } catch (error) {
@@ -106,11 +110,27 @@ const Dashboard = () => {
     try {
       if (editingProduct) {
         console.log("Dashboard.handleOk: updating product", editingProduct._id);
-        await axios.put(`/api/v1/products/${editingProduct._id}`, values);
+        await axios.put(
+          `/api/v1/products/${editingProduct._id}`, 
+          values,
+          {
+            headers: {
+              'user-email': userData.email
+            }
+          }
+        );
         message.success("Product updated successfully 🎉");
       } else {
         console.log("Dashboard.handleOk: creating new product");
-        await axios.post("/api/v1/products", values);
+        await axios.post(
+          "/api/v1/products", 
+          values,
+          {
+            headers: {
+              'user-email': userData.email
+            }
+          }
+        );
         message.success("Product created successfully 🎉");
       }
       fetchCounts();
@@ -163,7 +183,7 @@ const Dashboard = () => {
       recognition.stop();
     };
 
-    recognition.onerror = (event) => {
+    recognition.onerror = () => {
       message.error("Speech recognition error occurred.");
     };
   }, 300);

@@ -5,12 +5,13 @@ import "./Sidebar.css";
 import NotificationSidebar from "./Notifications";
 import userImage from "../../assets/user.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBell} from "@fortawesome/free-solid-svg-icons";
+import { MenuOutlined } from "@ant-design/icons";
 
 const fetchNotifications = async (userId, setHasNotifications) => {
   try {
     const response = await axios.get(`/api/v1/notifications/`);
-    const unreadNotifications = response.data.data.some(notification => !notification.read);
+    const unreadNotifications = response.data.some(notification => !notification.read);
     setHasNotifications(unreadNotifications);
   } catch (error) {
     console.error("Error fetching notifications:", error);
@@ -26,6 +27,12 @@ const Topbar = () => {
   const { userData } = useAuth();
   const [showSidebar, setShowSidebar] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    document.querySelector('.barbody')?.classList.toggle('show');
+  };
 
   useEffect(() => {
     if (userData?._id) {
@@ -38,18 +45,14 @@ const Topbar = () => {
     setHasNotifications(false);
   };
 
-  const toggleSidebar = () => {
-    document.querySelector('.barbody')?.classList.toggle('show');
-  };
-
   return userData ? (
     <>
       <div className="topbarContent">
-        <div className="showSidebar" onClick={toggleSidebar}>
-          <FontAwesomeIcon icon={faBars} size="xl" style={{ color: "#069f7e" }} />
-        </div>
-        <div className="topbarContent0">
-          <h3>{getGreeting()}, <span>{userData.name} 👋</span></h3>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <MenuOutlined className="mobile-menu-toggle" onClick={toggleMobileMenu} />
+          <div className="topbarContent0">
+            <h3>{getGreeting()}, <span>{userData.name} 👋</span></h3>
+          </div>
         </div>
         <div className="topbarContent1">
           <div className="flex1">

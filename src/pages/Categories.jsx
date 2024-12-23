@@ -15,10 +15,11 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { faFileArrowUp, faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import useSpeechRecognition from "../hooks/useSpeechRecognition";
 
 const { TabPane } = Tabs;
 
@@ -29,6 +30,7 @@ const Categories = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [activeTab, setActiveTab] = useState("live");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchCategories = async (search = "") => {
     setLoading(true);
@@ -195,6 +197,13 @@ const Categories = () => {
     }
   }, 300);
 
+  const handleSpeechResult = (transcript) => {
+    setSearchTerm(transcript);
+    handleSearch(transcript);
+  };
+
+  const handleMicClick = useSpeechRecognition(handleSpeechResult);
+
   const columns = [
     {
       title: "Category Name",
@@ -277,12 +286,29 @@ const Categories = () => {
         <div className="details">
           <span style={{ margin: "0 8px", marginTop: "60px" }} />
           <div className="searchBarContainer">
-            <Input
-              className="searchBar"
-              placeholder="Search Categories by name"
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: "100%" }}
-            />
+            <div className="searchBarWrapper" style={{ display: "flex", alignItems: "center", width: "100%" }}>
+              <Input
+                className="searchBar"
+                placeholder="Search Categories by name"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  handleSearch(e.target.value);
+                }}
+                style={{ width: "100%" }}
+              />
+              <FontAwesomeIcon
+                icon={faMicrophone}
+                size="lg"
+                style={{
+                  color: "#616a73",
+                  marginLeft: "-40px",
+                  zIndex: "3",
+                  cursor: "pointer",
+                }}
+                onClick={handleMicClick}
+              />
+            </div>
             <Button type="primary" className="addBtn" onClick={handleDownload}>
               Download Excel Template
             </Button>

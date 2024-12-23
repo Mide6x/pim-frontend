@@ -80,6 +80,7 @@ const Images = () => {
       console.log("Fetched processed images:", response.data);
       setProcessedImages(response.data);
       message.success("Images processed successfully 🎉");
+      setActiveTab("2");
     } catch (error) {
       console.error("Error processing images:", error);
       message.error(`Error processing images: ${error.message}`);

@@ -6,8 +6,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileArrowUp,
   faPenToSquare,
+  faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import useSpeechRecognition from "../../hooks/useSpeechRecognition";
 
 const CategoryDetails = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const CategoryDetails = () => {
   const [isCategoryEdit, setIsCategoryEdit] = useState(false);
   const [subcategoriesList, setSubcategoriesList] = useState([]);
   const [archivedSubcategoriesList, setArchivedSubcategoriesList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
  
   useEffect(() => {
     const fetchCategoryDetails = async () => {
@@ -179,6 +182,13 @@ const CategoryDetails = () => {
     }
   };
 
+  const handleSpeechResult = (transcript) => {
+    setSearchTerm(transcript);
+    handleSearch(transcript);
+  };
+
+  const handleMicClick = useSpeechRecognition(handleSpeechResult);
+
   const columns = [
     {
       title: "Subcategory",
@@ -250,12 +260,29 @@ const CategoryDetails = () => {
       children: (
         <>
           <div className="searchBarContainer">
-            <Input
-              placeholder="Search Subcategories by name"
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: "100%" }}
-              className="searchBar"
-            />
+            <div className="searchBarWrapper" style={{ display: "flex", alignItems: "center", width: "100%" }}>
+              <Input
+                placeholder="Search Subcategories by name"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  handleSearch(e.target.value);
+                }}
+                style={{ width: "100%" }}
+                className="searchBar"
+              />
+              <FontAwesomeIcon
+                icon={faMicrophone}
+                size="lg"
+                style={{
+                  color: "#616a73",
+                  marginLeft: "-40px",
+                  zIndex: "3",
+                  cursor: "pointer",
+                }}
+                onClick={handleMicClick}
+              />
+            </div>
             <Button
               type="primary"
               className="archiveBtn"

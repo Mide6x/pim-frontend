@@ -11,6 +11,7 @@ import { getProductDetailsFromOpenAI } from "../../hooks/productAddWithOpenAI";
 import useAutoPopulateDescription from "../../hooks/useAutoPopulateDescription";
 import useAuth from "../../contexts/useAuth";
 import ImageUploadSection from "./ImageUpload";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -208,7 +209,14 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
               <Form.Item
                 name="productName"
                 rules={[
-                  { required: true, message: "Please enter the product name" },
+                  {
+                    required: true,
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please enter the product name
+                      </div>
+                    ),
+                  },
                 ]}
               >
                 <Input className="userInput" placeholder="Product Name" />
@@ -220,7 +228,11 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter the manufacturer name",
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please enter the manufacturer name
+                      </div>
+                    ),
                   },
                 ]}
               >
@@ -262,19 +274,27 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
               </Form.Item>
 
               <div className="aiUseNotification">
+                <FontAwesomeIcon 
+                  icon={faCircleExclamation} 
+                />
                 <p>
-                  <FontAwesomeIcon
-                    icon={faCircleExclamation}
-                    style={{ color: "#212b36" }}
-                  />{" "}
-                  Suggestions made by artificial intelligence may sometimes be
-                  inaccurate. Please check again for data accuracy.
+                  Suggestions made by artificial intelligence may sometimes be inaccurate. 
+                  Please check again for data accuracy.
                 </p>
               </div>
               <p className="formTitle">Brand</p>
               <Form.Item
                 name="brand"
-                rules={[{ required: true, message: "Please enter the brand" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please select a brand
+                      </div>
+                    ),
+                  },
+                ]}
               >
                 <Select
                   className="userSelection"
@@ -299,7 +319,11 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
                 rules={[
                   {
                     required: true,
-                    message: "Please input the product's category",
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please input the product&apos;s category
+                      </div>
+                    ),
                   },
                 ]}
               >
@@ -311,12 +335,6 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
                   filterOption={(input, option) =>
                     option.children.toLowerCase().includes(input.toLowerCase())
                   }
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter the product category",
-                    },
-                  ]}
                 >
                   {categories
                     .sort((a, b) => a.name.localeCompare(b.name))
@@ -333,13 +351,20 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter the product subcategory",
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please enter the product subcategory
+                      </div>
+                    ),
                   },
                 ]}
               >
                 <Select
                   className="userSelection"
                   placeholder="Product Subcategory"
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  }
                 >
                   {subcategories.map((subcategory) => (
                     <Option key={subcategory} value={subcategory}>
@@ -352,7 +377,14 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
               <Form.Item
                 name="variantType"
                 rules={[
-                  { required: true, message: "Please select a variant type" },
+                  {
+                    required: true,
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please select a variant type
+                      </div>
+                    ),
+                  },
                 ]}
               >
                 <Select
@@ -382,7 +414,14 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
               <Form.Item
                 name="variant"
                 rules={[
-                  { required: true, message: "Please enter the variant" },
+                  {
+                    required: true,
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please enter the variant
+                      </div>
+                    ),
+                  },
                 ]}
               >
                 {selectedVariant &&
@@ -418,7 +457,11 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter the weight of the product",
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please enter the weight of the product
+                      </div>
+                    ),
                   },
                 ]}
               >
@@ -430,7 +473,19 @@ const ProductForm = ({ initialValues, onCancel, onOk }) => {
               </Form.Item>
 
               <p className="formTitle">Product Description</p>
-              <Form.Item name="description">
+              <Form.Item
+                name="description"
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <div className="validation-error">
+                        <ExclamationCircleOutlined /> Please enter a product description
+                      </div>
+                    ),
+                  },
+                ]}
+              >
                 <Input.TextArea
                   className="userInput"
                   placeholder="Description"

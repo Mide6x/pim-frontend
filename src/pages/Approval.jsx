@@ -55,6 +55,7 @@ const Approval = () => {
       setLoading(false);
     }
   };
+
   const handleBulkApprove = async () => {
     console.log("Selected rows to be approved:", selectedRows);
     setLoading(true);
@@ -64,25 +65,27 @@ const Approval = () => {
         status: "approved",
         createdBy: userData.email ? userData.email.toString() : userData._id,
       }));
-      console.log("Approved items to be sent to server:", approvedItems);
+
       await Promise.all(
         approvedItems.map(async (item) => {
-          console.log("Sending request to server for item:", item);
           await axios.put(
             `/api/v1/approvals/${item._id}`,
-            item
+            item,
+            {
+              headers: {
+                'user-email': userData.email // Add user email to headers
+              }
+            }
           );
-          console.log("Request sent successfully for item:", item);
         })
       );
-      console.log("All requests sent successfully");
+
       message.success("Selected items approved successfully 🎉");
       fetchApprovals();
     } catch (error) {
       console.error("Error occurred while approving selected items:", error);
       message.error("Failed to approve selected items 😔");
     } finally {
-      console.log("Operation completed");
       setLoading(false);
     }
   };
@@ -137,38 +140,74 @@ const Approval = () => {
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      // Step 1: Check for duplicates among approved approvals
-      const duplicateNames = await checkForDuplicates(approvedApprovals);
-      const uniqueProducts = approvedApprovals.filter(
+      const selectedProducts = selectedRows;
+
+      if (selectedProducts.length === 0) {
+        message.warning("Please select products to process");
+        return;
+      }
+
+      // Check for duplicates
+      const duplicateNames = await checkForDuplicates(selectedProducts);
+      const uniqueProducts = selectedProducts.filter(
         (product) => !duplicateNames.includes(product.productName)
       );
-  
-      // Step 2: Send unique products to the bulk endpoint
-      if (uniqueProducts.length > 0) {
-        const response = await axios.post("/api/v1/products/bulk", uniqueProducts);
-        console.log("Backend response:", response);
-        message.success("Unique products have been successfully pushed to the database");
-  
-        // Step 3: Delete the approved products only after successful bulk insert
-        await axios.delete("/api/v1/approvals/delete-approved");
-        setApprovedApprovals([]); // Clear the state of approved products
-        fetchApprovals(); // Refresh approvals list
+    
+      // Format products for bulk creation
+      const formattedProducts = uniqueProducts.map(product => ({
+        manufacturerName: product.manufacturerName,
+        brand: product.brand,
+        productCategory: product.productCategory,
+        productSubcategory: product.productSubcategory || "",
+        productName: product.productName,
+        variantType: product.variantType,
+        variant: product.variant,
+        weight: product.weightInKg,
+        weightInKg: product.weightInKg,
+        imageUrl: product.imageUrl,
+        createdBy: userData.email
+      }));
+
+      // Push unique products to database
+      if (formattedProducts.length > 0) {
+        await axios.post(
+          "/api/v1/products/bulk", 
+          formattedProducts,
+          {
+            headers: {
+              'user-email': userData.email
+            }
+          }
+        );
+        message.success(`${formattedProducts.length} products successfully pushed to database 🎉`);
       }
-  
-      // Step 4: Handle duplicates and notify the user
+    
+      // Handle duplicates
       if (duplicateNames.length > 0) {
-        message.warning(
-          "Some products are already in the database. Duplicates have been moved to the 'Duplicate Products' tab."
+        const duplicateProducts = selectedProducts.filter(
+          (product) => duplicateNames.includes(product.productName)
         );
-        setDuplicateApprovals(
-          approvedApprovals.filter((product) =>
-            duplicateNames.includes(product.productName)
-          )
-        );
+        setDuplicateApprovals(prev => [...prev, ...duplicateProducts]);
+        message.warning(`${duplicateNames.length} duplicate products moved to Duplicates tab`);
       }
+    
+      // Delete processed approvals
+      if (selectedProducts.length > 0) {
+        await axios.post("/api/v1/approvals/delete-duplicates", { 
+          ids: selectedProducts.map(product => product._id)
+        }, {
+          headers: {
+            'user-email': userData.email
+          }
+        });
+      }
+      
+      await fetchApprovals();
+      setSelectedRows([]);
+      
     } catch (error) {
       console.error("Failed to process approved products:", error);
-      message.error("Failed to process approved products");
+      message.error("Failed to process approved products 😔");
     } finally {
       setLoading(false);
     }
@@ -194,11 +233,18 @@ const Approval = () => {
       const ids = duplicateApprovals.map((product) => product._id);
       await axios.post(
         "/api/v1/approvals/delete-duplicates",
-        { ids }
+        { ids },
+        {
+          headers: {
+            'user-email': userData.email
+          }
+        }
       );
       message.success("Duplicate products have been deleted 🎉");
       fetchApprovals();
+      setDuplicateApprovals([]);
     } catch (error) {
+      console.error("Error deleting duplicates:", error);
       message.error("Failed to delete duplicate products 😔");
     } finally {
       setLoading(false);
@@ -517,6 +563,23 @@ const ApprovalForm = ({ initialValues, onCancel, onOk }) => {
       onFinish={(values) => onOk({ ...values })}
       initialValues={initialValues}
     >
+      {initialValues?.imageUrl && (
+        <div className="approval-image-preview">
+          <img 
+            src={initialValues.imageUrl} 
+            alt="Product"
+            style={{
+              width: '100%',
+              maxHeight: '200px',
+              objectFit: 'contain',
+              marginBottom: '20px',
+              borderRadius: '8px',
+              border: '1px solid #d9d9d9'
+            }}
+          />
+        </div>
+      )}
+
       <Form.Item
         label="Product Name"
         name="productName"

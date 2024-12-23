@@ -15,11 +15,12 @@ import {
 import axios from "axios";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { faFileArrowUp, faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { debounce } from "lodash";
 import { Link } from "react-router-dom";
+import useSpeechRecognition from "../hooks/useSpeechRecognition";
 
 const { TabPane } = Tabs;
 
@@ -375,32 +376,60 @@ const ManufacturerActions = ({
   handleUpload,
   handleCreate,
   handleSearch,
-}) => (
-  <div className="searchBarContainer">
-    <Input
-      placeholder="Search Manufacturer"
-      onChange={(e) => handleSearch(e.target.value)}
-        style={{ width: "100%" }}
-              className="searchBar"
-    />
-    <Button className="addBtn" onClick={handleDownload}>
-      Download Template
-    </Button>
-    <Upload beforeUpload={() => false} onChange={handleUpload}>
-      <Button className="archiveBtn">
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSpeechResult = (transcript) => {
+    setSearchTerm(transcript);
+    handleSearch(transcript);
+  };
+
+  const handleMicClick = useSpeechRecognition(handleSpeechResult);
+
+  return (
+    <div className="searchBarContainer">
+      <div className="searchBarWrapper" style={{ display: "flex", alignItems: "center", width: "100%" }}>
+        <Input
+          placeholder="Search Manufacturer"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            handleSearch(e.target.value);
+          }}
+          style={{ width: "100%" }}
+          className="searchBar"
+        />
         <FontAwesomeIcon
+          icon={faMicrophone}
           size="lg"
-          style={{ color: "#008162" }}
-          icon={faFileArrowUp}
-        />{" "}
-        Bulk Upload
+          style={{
+            color: "#616a73",
+            marginLeft: "-40px",
+            zIndex: "3",
+            cursor: "pointer",
+          }}
+          onClick={handleMicClick}
+        />
+      </div>
+      <Button className="addBtn" onClick={handleDownload}>
+        Download Template
       </Button>
-    </Upload>
-    <Button className="addBtn" onClick={handleCreate}>
-      Add Manufacturer
-    </Button>
-  </div>
-);
+      <Upload beforeUpload={() => false} onChange={handleUpload}>
+        <Button className="archiveBtn">
+          <FontAwesomeIcon
+            size="lg"
+            style={{ color: "#008162" }}
+            icon={faFileArrowUp}
+          />{" "}
+          Bulk Upload
+        </Button>
+      </Upload>
+      <Button className="addBtn" onClick={handleCreate}>
+        Add Manufacturer
+      </Button>
+    </div>
+  );
+};
 
 const ManufacturerModal = ({
   isVisible,

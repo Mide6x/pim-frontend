@@ -15,6 +15,7 @@ import {
 import useAuth from "../../contexts/useAuth";
 import "./Sidebar.css";
 import logoImage from "../../assets/logo.png";
+import { MenuOutlined } from '@ant-design/icons';
 
 const menuItems = [
   {
@@ -45,10 +46,19 @@ const menuItems = [
 ];
 
 const getIcon = (icon) => (
-  <FontAwesomeIcon icon={icon} size="lg" style={{ color: "#ffffff" }} />
+  <FontAwesomeIcon 
+    icon={icon} 
+    size="lg" 
+    style={{ 
+      color: "#ffffff",
+      width: "18px",
+      height: "18px",
+      opacity: 0.9 
+    }} 
+  />
 );
 
-const MenuItem = React.memo(function MenuItem({ item, isActive }) {
+const MenuItem = React.memo(function MenuItem({ item, isActive, onMobileMenuClose }) {
   const { key, label, to, icon } = item;
   return (
     <Menu.Item
@@ -56,12 +66,12 @@ const MenuItem = React.memo(function MenuItem({ item, isActive }) {
       icon={getIcon(icon)}
       style={{ padding: "5px", color: "#ffffff", fontWeight: "450" }}
       className={isActive ? "active-menu-item" : "menuItem"}
+      onClick={onMobileMenuClose}
     >
       <Link to={to}>{label}</Link>
     </Menu.Item>
   );
 });
-MenuItem.displayName = "MenuItem";
 
 MenuItem.propTypes = {
   item: PropTypes.shape({
@@ -71,12 +81,22 @@ MenuItem.propTypes = {
     to: PropTypes.string.isRequired,
   }).isRequired,
   isActive: PropTypes.bool.isRequired,
+  onMobileMenuClose: PropTypes.func.isRequired,
 };
 
 const Sidebar = () => {
   const { logout } = useAuth();
   const location = useLocation();
   const [currentKey, setCurrentKey] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  useEffect(() => {
+    closeMobileMenu();
+  }, [location]);
 
   useEffect(() => {
     const activeItem = menuItems.flatMap(section => section.items).find((item) => item.to === location.pathname);
@@ -87,30 +107,53 @@ const Sidebar = () => {
     logout();
   }, [logout]);
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <div className="barbody">
-      <Header logoImage={logoImage} />
+    <>
+      <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
+        <MenuOutlined />
+      </div>
+      
+      <div className={`barbody ${isMobileMenuOpen ? 'show' : ''}`}>
+        <Header logoImage={logoImage}>
+          <div style={{ backgroundColor: "#000", padding: "2px 8px", borderRadius: "4px", marginLeft: "8px", display: "inline-block" }}>
+            <span style={{ color: "#fff", fontWeight: "bold" }}>AI</span>
+          </div>
+        </Header>
 
-      <Menu
-        mode="inline"
-        selectedKeys={[currentKey]}
-        style={{ marginTop: "20px", fontSize: "15px", backgroundColor: "#212B36" }}
-      >
-        {menuItems.map((section, index) => (
-          <Menu.ItemGroup 
-            key={index} 
-            title={section.label}
-            style={{ color: "#C0C0C0", fontWeight: "bold" }}
-          >
-            {section.items.map((item) => (
-              <MenuItem key={item.key} item={item} isActive={item.key === currentKey} />
-            ))}
-          </Menu.ItemGroup>
-        ))}
-      </Menu>
+        <Menu
+          mode="inline"
+          selectedKeys={[currentKey]}
+          style={{ marginTop: "20px", fontSize: "15px", backgroundColor: "#212B36" }}
+        >
+          {menuItems.map((section, index) => (
+            <Menu.ItemGroup 
+              key={index} 
+              title={section.label}
+              style={{ color: "#C0C0C0", fontWeight: "bold" }}
+            >
+              {section.items.map((item) => (
+                <MenuItem 
+                  key={item.key} 
+                  item={item} 
+                  isActive={item.key === currentKey}
+                  onMobileMenuClose={closeMobileMenu}
+                />
+              ))}
+            </Menu.ItemGroup>
+          ))}
+        </Menu>
 
-      <LogoutSection handleLogout={handleLogout} />
-    </div>
+        <LogoutSection handleLogout={handleLogout} />
+      </div>
+      <div 
+        className={`sidebar-backdrop ${isMobileMenuOpen ? 'show' : ''}`}
+        onClick={closeMobileMenu}
+      />
+    </>
   );
 };
 
@@ -118,6 +161,9 @@ const Header = ({ logoImage }) => (
   <div className="header">
     <div className="image">
       <img src={logoImage} className="logo-img" alt="Logo" />
+      <div className="ai-badge">
+        <span>AI</span>
+      </div>
     </div>
   </div>
 );

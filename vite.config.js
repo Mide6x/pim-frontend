@@ -8,7 +8,7 @@ export default defineConfig({
   server:{
     host: true,
     proxy: {
-      '/api': 'https://prod-nnal.onrender.com',
+      '/api': 'http://localhost:3000',
     }
   }
  

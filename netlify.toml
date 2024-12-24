@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "${VITE_API_URL}/api/:splat"
+  to = "https://prod-nnal.onrender.com/api/:splat"
   status = 200
   force = true
 

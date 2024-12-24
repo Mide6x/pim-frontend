@@ -15,35 +15,6 @@ import {
 import useAuth from "../../contexts/useAuth";
 import "./Sidebar.css";
 import logoImage from "../../assets/logo.png";
-import { CloseOutlined } from '@ant-design/icons';
-
-const menuItems = [
-  {
-    type: "section",
-    label: "Overview",
-    items: [
-      { key: "1", label: "Dashboard", icon: faChartSimple, to: "/dashboard" },
-    ]
-  },
-  {
-    type: "section",
-    label: "Product Cleaning",
-    items: [
-      { key: "2", label: "Image Conversion", icon: faImage, to: "/images" },
-      { key: "3", label: "Data Cleaning", icon: faDatabase, to: "/uploadtab" },
-      { key: "4", label: "Approve Products", icon: faFileCircleCheck, to: "/approval" },
-    ]
-  },
-  {
-    type: "section",
-    label: "PIM Settings",
-    items: [
-      { key: "5", label: "Manage Manufacturers", icon: faIndustry, to: "/mngmanufacturers" },
-      { key: "6", label: "Manage Categories", icon: faCartShopping, to: "/categories" },
-      { key: "7", label: "Variant Types", icon: faScaleBalanced, to: "/variants" },
-    ]
-  }
-];
 
 const getIcon = (icon) => (
   <FontAwesomeIcon 
@@ -58,31 +29,64 @@ const getIcon = (icon) => (
   />
 );
 
-const MenuItem = React.memo(function MenuItem({ item, isActive, onMobileMenuClose }) {
-  const { key, label, to, icon } = item;
-  return (
-    <Menu.Item
-      key={key}
-      icon={getIcon(icon)}
-      style={{ padding: "5px", color: "#ffffff", fontWeight: "450" }}
-      className={isActive ? "active-menu-item" : "menuItem"}
-      onClick={onMobileMenuClose}
-    >
-      <Link to={to}>{label}</Link>
-    </Menu.Item>
-  );
-});
-
-MenuItem.propTypes = {
-  item: PropTypes.shape({
-    key: PropTypes.string.isRequired,
-    icon: PropTypes.object.isRequired,
-    label: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-  }).isRequired,
-  isActive: PropTypes.bool.isRequired,
-  onMobileMenuClose: PropTypes.func.isRequired,
-};
+const menuItems = [
+  {
+    type: 'group',
+    label: 'Overview',
+    key: 'overview',
+    children: [
+      {
+        key: '1',
+        label: <Link to="/dashboard">Dashboard</Link>,
+        icon: getIcon(faChartSimple),
+      },
+    ],
+  },
+  {
+    type: 'group',
+    label: 'Product Cleaning',
+    key: 'product-cleaning',
+    children: [
+      {
+        key: '2',
+        label: <Link to="/images">Image Conversion</Link>,
+        icon: getIcon(faImage),
+      },
+      {
+        key: '3',
+        label: <Link to="/uploadtab">Data Cleaning</Link>,
+        icon: getIcon(faDatabase),
+      },
+      {
+        key: '4',
+        label: <Link to="/approval">Approve Products</Link>,
+        icon: getIcon(faFileCircleCheck),
+      },
+    ],
+  },
+  {
+    type: 'group',
+    label: 'PIM Settings',
+    key: 'pim-settings',
+    children: [
+      {
+        key: '5',
+        label: <Link to="/mngmanufacturers">Manage Manufacturers</Link>,
+        icon: getIcon(faIndustry),
+      },
+      {
+        key: '6',
+        label: <Link to="/categories">Manage Categories</Link>,
+        icon: getIcon(faCartShopping),
+      },
+      {
+        key: '7',
+        label: <Link to="/variants">Variant Types</Link>,
+        icon: getIcon(faScaleBalanced),
+      },
+    ],
+  },
+];
 
 const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { logout } = useAuth();
@@ -90,7 +94,10 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const [currentKey, setCurrentKey] = useState("");
 
   useEffect(() => {
-    const activeItem = menuItems.flatMap(section => section.items).find((item) => item.to === location.pathname);
+    const activeItem = menuItems.flatMap(section => section.children).find((item) => {
+      const linkElement = item?.label?.props;
+      return linkElement?.to === location.pathname;
+    });
     setCurrentKey(activeItem ? activeItem.key : "");
   }, [location.pathname]);
 
@@ -107,34 +114,25 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
               <span style={{ color: "#fff", fontWeight: "bold" }}>AI</span>
             </div>
           </Header>
-          <CloseOutlined 
-            className="sidebar-close-button" 
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
         </div>
 
         <Menu
           mode="inline"
           selectedKeys={[currentKey]}
-          style={{ marginTop: "20px", fontSize: "15px", backgroundColor: "#212B36" }}
-        >
-          {menuItems.map((section, index) => (
-            <Menu.ItemGroup 
-              key={index} 
-              title={section.label}
-              style={{ color: "#C0C0C0", fontWeight: "bold" }}
-            >
-              {section.items.map((item) => (
-                <MenuItem 
-                  key={item.key} 
-                  item={item} 
-                  isActive={item.key === currentKey}
-                  onMobileMenuClose={() => setIsMobileMenuOpen(false)}
-                />
-              ))}
-            </Menu.ItemGroup>
-          ))}
-        </Menu>
+          items={menuItems}
+          style={{ 
+            marginTop: "20px", 
+            fontSize: "15px", 
+            backgroundColor: "#212B36",
+            color: "#ffffff" 
+          }}
+          onClick={() => {
+            // Close mobile menu after a slight delay to allow link navigation
+            setTimeout(() => {
+              setIsMobileMenuOpen(false);
+            }, 150);
+          }}
+        />
 
         <LogoutSection handleLogout={handleLogout} />
       </div>

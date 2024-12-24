@@ -5,7 +5,8 @@ import "./Sidebar.css";
 import NotificationSidebar from "./Notifications";
 import userImage from "../../assets/user.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell} from "@fortawesome/free-solid-svg-icons";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import PropTypes from "prop-types";
 import { MenuOutlined } from "@ant-design/icons";
 
 const fetchNotifications = async (userId, setHasNotifications) => {
@@ -23,16 +24,10 @@ const getGreeting = () => {
   return hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 };
 
-const Topbar = () => {
+const Topbar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { userData } = useAuth();
   const [showSidebar, setShowSidebar] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    document.querySelector('.barbody')?.classList.toggle('show');
-  };
 
   useEffect(() => {
     if (userData?._id) {
@@ -43,6 +38,10 @@ const Topbar = () => {
   const handleBellClick = () => {
     setShowSidebar(true);
     setHasNotifications(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return userData ? (
@@ -78,6 +77,11 @@ const Topbar = () => {
       {showSidebar && <NotificationSidebar userId={userData._id} onClose={() => setShowSidebar(false)} />}
     </>
   ) : null;
+};
+
+Topbar.propTypes = {
+  isMobileMenuOpen: PropTypes.bool.isRequired,
+  setIsMobileMenuOpen: PropTypes.func.isRequired
 };
 
 export default Topbar;

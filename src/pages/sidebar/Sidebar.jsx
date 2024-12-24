@@ -15,7 +15,7 @@ import {
 import useAuth from "../../contexts/useAuth";
 import "./Sidebar.css";
 import logoImage from "../../assets/logo.png";
-import { MenuOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 
 const menuItems = [
   {
@@ -84,19 +84,10 @@ MenuItem.propTypes = {
   onMobileMenuClose: PropTypes.func.isRequired,
 };
 
-const Sidebar = () => {
+const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { logout } = useAuth();
   const location = useLocation();
   const [currentKey, setCurrentKey] = useState("");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
-  useEffect(() => {
-    closeMobileMenu();
-  }, [location]);
 
   useEffect(() => {
     const activeItem = menuItems.flatMap(section => section.items).find((item) => item.to === location.pathname);
@@ -107,22 +98,20 @@ const Sidebar = () => {
     logout();
   }, [logout]);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
   return (
     <>
-      <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
-        <MenuOutlined />
-      </div>
-      
       <div className={`barbody ${isMobileMenuOpen ? 'show' : ''}`}>
-        <Header logoImage={logoImage}>
-          <div style={{ backgroundColor: "#000", padding: "2px 8px", borderRadius: "4px", marginLeft: "8px", display: "inline-block" }}>
-            <span style={{ color: "#fff", fontWeight: "bold" }}>AI</span>
-          </div>
-        </Header>
+        <div className="sidebar-header">
+          <Header logoImage={logoImage}>
+            <div style={{ backgroundColor: "#000", padding: "2px 8px", borderRadius: "4px", marginLeft: "8px", display: "inline-block" }}>
+              <span style={{ color: "#fff", fontWeight: "bold" }}>AI</span>
+            </div>
+          </Header>
+          <CloseOutlined 
+            className="sidebar-close-button" 
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        </div>
 
         <Menu
           mode="inline"
@@ -140,7 +129,7 @@ const Sidebar = () => {
                   key={item.key} 
                   item={item} 
                   isActive={item.key === currentKey}
-                  onMobileMenuClose={closeMobileMenu}
+                  onMobileMenuClose={() => setIsMobileMenuOpen(false)}
                 />
               ))}
             </Menu.ItemGroup>
@@ -151,7 +140,7 @@ const Sidebar = () => {
       </div>
       <div 
         className={`sidebar-backdrop ${isMobileMenuOpen ? 'show' : ''}`}
-        onClick={closeMobileMenu}
+        onClick={() => setIsMobileMenuOpen(false)}
       />
     </>
   );
@@ -190,4 +179,10 @@ LogoutSection.propTypes = {
 };
 
 LogoutSection.displayName = "LogoutSection";  
+
+Sidebar.propTypes = {
+  isMobileMenuOpen: PropTypes.bool.isRequired,
+  setIsMobileMenuOpen: PropTypes.func.isRequired
+};
+
 export default Sidebar;

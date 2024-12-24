@@ -27,6 +27,7 @@ h2 {
   display: flex;
   width: 100%;
   background: #f8f8f8;
+  min-height: 100vh;
 }
 
 .fullcontent {
@@ -37,7 +38,7 @@ h2 {
   overflow-y: auto;
   flex: 1;
   min-width: 0;
-  height: 100vh;
+  height: fit-content;
 }
 
 .details {
@@ -144,12 +145,9 @@ h2 {
 
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  padding: 0 0 24px 0;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
   width: 100%;
 }
 
@@ -543,9 +541,19 @@ Form {
 /* Media Queries for Responsive Design */
 @media screen and (max-width: 1024px) and (orientation: landscape),
   screen and (max-width: 834px) and (orientation: portrait) {
-  .content {
+  .container {
+    display: flex;
     width: 100% !important;
-    margin: -10px;
+    background: #f8f8f8;
+  }
+  .fullcontent {
+    margin-left: 10px !important;
+    margin-top: 30px !important;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    overflow-y: auto;
+    flex: 1;
+    width: 100% !important;
+    height: fit-content;
   }
 
   .infoContainer {
@@ -555,13 +563,15 @@ Form {
   }
 
   .table {
-    width: 100%;
+    width: 100% !important;
   }
 
   .stats-container {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 20px !important;
+    padding: 5px 10px !important;
+
   }
 
   .details {
@@ -908,135 +918,84 @@ Form {
 @media screen and (max-width: 768px) {
   .fullcontent {
     margin-left: 0;
-    width: 100%;
+    padding: 12px;
     margin-top: 60px;
-    padding: 16px;
   }
 
-  .content {
-    width: 95%;
-    margin: 0 auto;
-    padding: 10px 0;
+  .container {
+    padding: 0;
   }
 
-  .details {
-    width: 100%;
-    margin: 0 auto 16px;
+  .stats-container {
+    padding: 8px;
+    gap: 12px;
   }
 
-  .intro {
-    padding: 10px !important;
-  }
-
-  .intro h2 {
-    font-size: 1.5rem !important;
-  }
-
-  /* Table Responsiveness */
-  .table {
+  .stats-item0,
+  .stats-item1,
+  .stats-item2 {
     width: 100% !important;
-    overflow-x: auto !important;
+    margin: 0 !important;
+  }
+
+  .stats-item-content {
+    padding: 12px !important;
+  }
+
+  .table {
+    margin: 8px 0;
+    border-radius: 8px;
   }
 
   .ant-table {
-    font-size: 14px !important;
+    font-size: 13px !important;
   }
 
-  /* Product Details Layout */
-  .productDetails {
-    grid-template-columns: 1fr !important;
-    padding: 10px !important;
-    gap: 16px !important;
+  .ant-table-thead > tr > th {
+    padding: 8px !important;
   }
 
-  .infoContainer {
-    width: 100% !important;
-    height: auto !important;
-    padding: 15px !important;
+  .ant-table-tbody > tr > td {
+    padding: 8px !important;
   }
 
-  .infoTitle {
-    flex-direction: column !important;
-    gap: 15px !important;
-  }
-
-  .titleContent {
-    font-size: 1.2rem !important;
-    flex-direction: column !important;
-    text-align: center !important;
-  }
-
-  .buttonContainer {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    width: 100% !important;
-  }
-
-  .buttonContainer button {
-    width: 100% !important;
-    margin-left: 0 !important;
-  }
-
-  /* Modal Responsiveness */
-  .ant-modal {
-    width: 90% !important;
-    margin: 0 auto !important;
-  }
-
-  .concludeBtns {
-    flex-direction: column !important;
-  }
-
-  .concludeBtns button {
-    width: 100% !important;
-    margin: 5px 0 !important;
-  }
-
-  /* Image Responsiveness */
-  .detailsImage {
-    width: 100px !important;
-    height: 100px !important;
-  }
-
-  /* Form Elements */
-  .userInput, .userInputDesc {
-    width: 100% !important;
-  }
-
-  /* Tabs Responsiveness */
-  .ant-tabs-nav {
-    margin-bottom: 16px !important;
-  }
-
-  .ant-tabs-tab {
-    padding: 8px 12px !important;
-    margin: 0 4px !important;
-  }
-
-  /* Search Bar */
   .searchBarContainer {
-    flex-direction: column !important;
-    gap: 10px !important;
+    padding: 8px;
+    gap: 8px;
   }
 
   .searchBar {
-    width: 100% !important;
+    height: 40px !important;
+  }
+
+  .addBtn {
+    height: 40px !important;
+    padding: 0 16px !important;
+  }
+
+  .intro {
+    padding: 16px !important;
+    margin-bottom: 16px;
+  }
+
+  .intro h2 {
+    font-size: 24px !important;
   }
 }
 
 /* Additional Tablet Breakpoint */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
-  .productDetails {
-    grid-template-columns: repeat(2, 1fr) !important;
+  .fullcontent {
+    margin-left: 0;
+    padding: 16px;
   }
 
-  .infoContainer {
-    width: 100% !important;
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .table {
-    width: 100% !important;
+  .stats-item-content {
+    padding: 16px !important;
   }
 }
 

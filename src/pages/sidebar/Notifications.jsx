@@ -27,10 +27,15 @@ const NotificationSidebar = ({ onClose }) => {
       setError(null);
       try {
         const response = await axios.get(API_URL);
-        setNotifications(response.data || []);
-      } catch (err) {
-        console.error("Error fetching notifications:", err);
-        setError("Failed to load notifications.");
+        if (Array.isArray(response.data)) {
+          setNotifications(response.data);
+        } else {
+          setNotifications([]);
+          console.error('Invalid notifications data format:', response.data);
+        }
+      } catch (error) {
+        setError('Error fetching notifications');
+        console.error('Error fetching notifications:', error);
       } finally {
         setLoading(false);
       }
@@ -80,7 +85,7 @@ const NotificationSidebar = ({ onClose }) => {
   const renderNotifications = () => {
     if (loading) return <div className="emptyNotifications"><p>Loading notifications...</p></div>;
     if (error) return <div className="emptyNotifications"><p>{error}</p></div>;
-    if (notifications.length === 0) return <EmptyState />;
+    if (!Array.isArray(notifications) || notifications.length === 0) return <EmptyState />;
 
     return notifications.map((notification) => (
       <div
@@ -151,18 +156,22 @@ const NotificationSidebar = ({ onClose }) => {
               <FontAwesomeIcon icon={faBrain} />
               <h3>AI Summary</h3>
             </div>
-            {summary.split('\n').map((line, index) => (
-              <p key={index}>
-                {line.includes(':') ? (
-                  <>
-                    <strong>{line.split(':')[0]}:</strong>
-                    <span>{line.split(':')[1]}</span>
-                  </>
-                ) : (
-                  line
-                )}
-              </p>
-            ))}
+            {summaryLoading ? (
+              <p>Generating summary...</p>
+            ) : (
+              summary.split('\n').map((line, index) => (
+                <p key={index}>
+                  {line.startsWith('•') ? (
+                    <span>
+                      <span className="bullet">•</span>
+                      {line.substring(1)}
+                    </span>
+                  ) : (
+                    line
+                  )}
+                </p>
+              ))
+            )}
           </div>
         ) : (
           renderNotifications()

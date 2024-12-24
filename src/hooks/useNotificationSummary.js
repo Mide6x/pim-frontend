@@ -12,8 +12,13 @@ export const useNotificationSummary = () => {
   const [loading, setLoading] = useState(false);
 
   const generateSummary = async (notifications) => {
-    setLoading(true);
+    if (!Array.isArray(notifications) || notifications.length === 0) {
+      setSummary('No notifications to summarize');
+      return;
+    }
+
     try {
+      setLoading(true);
       const last24Hours = notifications.filter(notification => {
         const notificationDate = new Date(notification.createdAt);
         const now = new Date();
@@ -45,7 +50,7 @@ export const useNotificationSummary = () => {
   };
 
   const toggleSummaryView = async (notifications) => {
-    if (!isSummaryView) {
+    if (!isSummaryView && Array.isArray(notifications)) {
       await generateSummary(notifications);
     }
     setIsSummaryView(!isSummaryView);

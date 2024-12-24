@@ -136,21 +136,21 @@ const NotificationSidebar = ({ onClose }) => {
             title={isSummaryView ? "Show all notifications" : "View AI Summary"}
             disabled={loading || summaryLoading}
           >
-            {summaryLoading ? "Generating..." : "AI Summarize"}
+            {summaryLoading ? "Summarizing..." : "AI Summarize"}
           </button>
       <div className="notificationList">
         {(loading || summaryLoading) ? (
           <div className="emptyNotifications">
-            <p>{summaryLoading ? "Generating summary..." : "Loading notifications..."}</p>
+            <p>{summaryLoading ? "Getting summary..." : "Loading notifications..."}</p>
           </div>
         ) : isSummaryView ? (
           <div className="notificationSummary">
             <div className="aiUseNotification">
               <FontAwesomeIcon icon={faCircleExclamation} style={{ color: "#b76e00" }} />
-              <p>
+              <span style={{ color: "#b76e00", fontSize: "13px", lineHeight: "1.5" }}>
                 Suggestions made by artificial intelligence may sometimes be inaccurate. 
                 Please check again for data accuracy.
-              </p>
+              </span>
             </div>
             <div className="summaryHeader">
               <FontAwesomeIcon icon={faBrain} />

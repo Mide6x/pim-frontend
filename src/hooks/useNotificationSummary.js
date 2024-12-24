@@ -31,13 +31,26 @@ export const useNotificationSummary = () => {
         return;
       }
 
-      const prompt = `Summarize these notifications by user email and action type:
-        ${JSON.stringify(last24Hours)}
-        Format: "user@email.com: performed X actions, Y edits, etc."`;
+      const prompt = `Analyze these notifications and provide a detailed summary for each user:
+${JSON.stringify(last24Hours)}
+
+Please follow these guidelines:
+1. Group by user email
+2. Count and categorize each specific action type (create, update, delete, approve, reject)
+3. Format each user's summary in a clear, concise way
+4. Do not use "etc" or abbreviations
+5. Include all actions performed by each user
+
+Example format:
+"user@email.com: performed 3 actions (2 approvals, 1 rejection)"
+
+Make the summary professional and precise, similar to Apple's intelligence summaries.`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
         messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 500
       });
 
       setSummary(response.choices[0].message.content);

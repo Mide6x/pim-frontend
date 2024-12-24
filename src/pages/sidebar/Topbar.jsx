@@ -47,34 +47,43 @@ const Topbar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   return userData ? (
     <>
       <div className="topbarContent">
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="topbar-left">
           <MenuOutlined className="mobile-menu-toggle" onClick={toggleMobileMenu} />
           <div className="topbarContent0">
-            <h3>{getGreeting()}, <span>{userData.name} 👋</span></h3>
+            <h3>
+              {getGreeting()}, <span>{userData.name}</span> <span role="img" aria-label="wave">👋</span>
+            </h3>
           </div>
         </div>
+
         <div className="topbarContent1">
           <div className="flex1">
-            <div className="bellIconWrapper">
+            <div className="bellIconWrapper" onClick={handleBellClick}>
               <FontAwesomeIcon
                 icon={faBell}
-                size="xl"
                 className="iconContent3"
-                onClick={handleBellClick}
               />
               {hasNotifications && <div className="notificationDot"></div>}
             </div>
           </div>
-          <div className="flex2">
-            <img src={userImage} className="logo-img2" alt="User" />
-          </div>
-          <div className="flex3">
-            <h3><span>{userData.name}.</span></h3>
-            <p style={{ fontSize: "12px", color: "#878787" }}>{userData.email}</p>
+          
+          <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="flex2" style={{ display: 'inline-flex' }}>
+              <img src={userImage} className="logo-img2" alt="User" />
+            </div>
+            <div className="flex3">
+              <h3>{userData.name}</h3>
+              <p>{userData.email}</p>
+            </div>
           </div>
         </div>
       </div>
-      {showSidebar && <NotificationSidebar userId={userData._id} onClose={() => setShowSidebar(false)} />}
+      {showSidebar && (
+        <NotificationSidebar 
+          userId={userData._id} 
+          onClose={() => setShowSidebar(false)} 
+        />
+      )}
     </>
   ) : null;
 };

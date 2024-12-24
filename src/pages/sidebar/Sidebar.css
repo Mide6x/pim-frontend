@@ -664,3 +664,49 @@
   align-items: center;
   gap: 8px;
 }
+
+/* User Profile Section */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .user-info {
+    display: none; /* Hide username and email on mobile */
+  }
+
+  .topbarContent {
+    padding: 10px 16px;
+    height: 60px;
+    left: 0;
+  }
+
+  .topbarContent0 {
+    font-size: 16px;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bellIconWrapper {
+    position: static;
+    margin: 0;
+    width: fit-content;
+  }
+
+  .notificationDot {
+    top: 15px;
+    right: 20px;
+  }
+}

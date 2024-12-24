@@ -67,11 +67,11 @@ const Topbar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
             </div>
           </div>
           
-          <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="flex2" style={{ display: 'inline-flex' }}>
+          <div className="user-profile">
+            <div className="flex2">
               <img src={userImage} className="logo-img2" alt="User" />
             </div>
-            <div className="flex3">
+            <div className="user-info">
               <h3>{userData.name}</h3>
               <p>{userData.email}</p>
             </div>

@@ -675,7 +675,7 @@
 .user-info {
   display: flex;
   flex-direction: column;
-}
+  font-size: 14px;}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {

@@ -150,7 +150,7 @@ const ProductDetails = () => {
   };
 
   if (!product) {
-    return   <Flex vertical flex={1} className="content">
+    return   <Flex vertical flex={1} className="fullcontent">
     <div className="intro">
       <Button
         icon={<ArrowLeftOutlined />}
@@ -165,7 +165,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <Flex vertical flex={1} className="content">
+    <Flex vertical flex={1} className="fullcontent">
       <div className="intro">
         <Button
           icon={<ArrowLeftOutlined />}

@@ -15,13 +15,13 @@ import {
 import axios from "axios";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileArrowUp, faMicrophone } from "@fortawesome/free-solid-svg-icons";
+import { faFileArrowUp, faMicrophone, faIndustry, faCheckCircle, faArchive } from "@fortawesome/free-solid-svg-icons";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { debounce } from "lodash";
 import { Link } from "react-router-dom";
 import useSpeechRecognition from "../hooks/useSpeechRecognition";
-
+import useAuth from "../contexts/useAuth";
 const { TabPane } = Tabs;
 
 const formatDate = (dateString) => {
@@ -96,6 +96,7 @@ const createColumns = (handleEdit, handleDelete, handleUnarchive = null) => [
 ];
 
 const MngManufacturers = () => {
+  const { userData } = useAuth();
   const [manufacturers, setManufacturers] = useState([]);
   const [archivedManufacturers, setArchivedManufacturers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +104,7 @@ const MngManufacturers = () => {
   const [editingManufacturer, setEditingManufacturer] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [activeTab, setActiveTab] = useState("live");
-  
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchManufacturers = async (search = "") => {
     setLoading(true);
@@ -271,163 +272,175 @@ const MngManufacturers = () => {
     value.length >= 3 ? fetchManufacturers(value) : fetchManufacturers();
   }, 300);
 
-  return (
-    <Flex vertical flex={1} className="content">
-      <div>
-        <div className="intro">
-          <h2>Manufacturers</h2>
-        </div>
-        <ManufacturerStats
-          manufacturerCount={
-            manufacturers.length + archivedManufacturers.length
-          }
-          activeManufacturerCount={manufacturers.length}
-          inactiveManufacturerCount={archivedManufacturers.length}
-        />
-        <div className="details">
-          <span style={{ margin: "0 8px", marginTop: "60px" }} />
-          <ManufacturerActions
-            handleDownload={handleDownload}
-            handleUpload={handleUpload}
-            handleCreate={handleCreate}
-            handleSearch={handleSearch}
-          />
-          <Tabs    className="table" activeKey={activeTab} onChange={setActiveTab}>
-            <TabPane tab="Live Manufacturers" key="live">
-              <Table
-                columns={createColumns(handleEdit)}
-                dataSource={manufacturers}
-                loading={loading}
-                rowKey="_id"
-                pagination={{ position: ["bottomCenter"] }}
-              />
-            </TabPane>
-            <TabPane tab="Archived Manufacturers" key="archived">
-              <Table
-                columns={createColumns(
-                  handleEdit,
-                  handleDelete,
-                  handleUnarchive
-                )}
-                dataSource={archivedManufacturers}
-                rowSelection={rowSelection}
-                loading={loading}
-                rowKey="_id"
-                pagination={{ position: ["bottomCenter"] }}
-              />
-              <Button
-                type="primary"
-                className="spaced archiveBtn"
-                onClick={handleBulkUnarchive}
-                style={{ marginTop: "20px" }}
-                disabled={selectedRows.length === 0}
-              >
-                Unarchive Selected
-              </Button>
-            </TabPane>
-          </Tabs>
-        </div>
-        <ManufacturerModal
-          isVisible={isModalVisible}
-          editingManufacturer={editingManufacturer}
-          onCancel={() => setIsModalVisible(false)}
-          onOk={handleOk}
-        />
-      </div>
-    </Flex>
-  );
-};
-
-const ManufacturerStats = ({
-  manufacturerCount,
-  activeManufacturerCount,
-  inactiveManufacturerCount,
-}) => (
-  <div className="stats-container">
-    <Card className="stats-item0">
-      <div className="stats-item-content">
-        <div className="text-content">
-          <p className="stats-item-header">Total Manufacturer</p>
-          <p className="stats-item-body">{manufacturerCount}</p>
-        </div>
-      </div>
-    </Card>
-    <Card className="stats-item1">
-      <div className="stats-item-content">
-        <div className="text-content">
-          <p className="stats-item-header">Active Manufacturers</p>
-          <p className="stats-item-body">{activeManufacturerCount}</p>
-        </div>
-      </div>
-    </Card>
-    <Card className="stats-item2">
-      <div className="stats-item-content">
-        <div className="text-content">
-          <p className="stats-item-header">Inactive Manufacturers</p>
-          <p className="stats-item-body">{inactiveManufacturerCount}</p>
-        </div>
-      </div>
-    </Card>
-  </div>
-);
-
-const ManufacturerActions = ({
-  handleDownload,
-  handleUpload,
-  handleCreate,
-  handleSearch,
-}) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
   const handleSpeechResult = (transcript) => {
     setSearchTerm(transcript);
     handleSearch(transcript);
   };
 
-  const handleMicClick = useSpeechRecognition(handleSpeechResult);
-
+  const handleMicrophoneClick = useSpeechRecognition(handleSpeechResult);
   return (
-    <div className="searchBarContainer">
-      <div className="searchBarWrapper" style={{ display: "flex", alignItems: "center", width: "100%" }}>
-        <Input
-          placeholder="Search Manufacturer"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            handleSearch(e.target.value);
-          }}
-          style={{ width: "100%" }}
-          className="searchBar"
-        />
-        <FontAwesomeIcon
-          icon={faMicrophone}
-          size="lg"
-          style={{
-            color: "#616a73",
-            marginLeft: "-40px",
-            zIndex: "3",
-            cursor: "pointer",
-          }}
-          onClick={handleMicClick}
-        />
-      </div>
-      <Button className="addBtn" onClick={handleDownload}>
-        Download Template
-      </Button>
-      <Upload beforeUpload={() => false} onChange={handleUpload}>
-        <Button className="archiveBtn">
-          <FontAwesomeIcon
-            size="lg"
-            style={{ color: "#008162" }}
-            icon={faFileArrowUp}
-          />{" "}
-          Bulk Upload
-        </Button>
-      </Upload>
-      <Button className="addBtn" onClick={handleCreate}>
-        Add Manufacturer
-      </Button>
-    </div>
+    <>
+      {userData && (
+        <Flex vertical flex={1} className="fullcontent">
+          <div>
+            <div className="intro">
+              <h2>Manufacturers</h2>
+              <span style={{ fontSize: "15px", color: "#878787" }}>
+                {new Date().toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}
+              </span>
+            </div>
+            <div className="stats-container">
+              <Card className="stats-item0">
+                <div className="stats-item-content">
+                  <div>
+                    <FontAwesomeIcon
+                      icon={faIndustry}
+                      size="2xl"
+                      style={{ color: "#ffffff" }}
+                      className="iconContent"
+                    />
+                  </div>
+                  <div className="text-content">
+                    <p className="stats-item-header">Total Manufacturers</p>
+                    <p className="stats-item-body">
+                      {manufacturers.length + archivedManufacturers.length}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="stats-item1">
+                <div className="stats-item-content">
+                  <div>
+                    <FontAwesomeIcon
+                      icon={faCheckCircle}
+                      size="2xl"
+                      className="iconContent"
+                      style={{ color: "#ffffff" }}
+                    />
+                  </div>
+                  <div className="text-content">
+                    <p className="stats-item-header">Active Manufacturers</p>
+                    <p className="stats-item-body">{manufacturers.length}</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="stats-item2">
+                <div className="stats-item-content">
+                  <div>
+                    <FontAwesomeIcon
+                      icon={faArchive}
+                      className="iconContent"
+                      size="2xl"
+                      style={{ color: "#ffffff" }}
+                    />
+                  </div>
+                  <div className="text-content">
+                    <p className="stats-item-header">Inactive Manufacturers</p>
+                    <p className="stats-item-body">{archivedManufacturers.length}</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+            <div className="details">
+              <div className="searchBarContainer">
+                <div
+                  className="searchBarWrapper"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Input
+                    placeholder="Search Manufacturer"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      handleSearch(e.target.value);
+                    }}
+                    style={{ width: "100%" }}
+                    className="searchBar"
+                  />
+                  <FontAwesomeIcon
+                    icon={faMicrophone}
+                    size="lg"
+                    style={{
+                      color: "#616a73",
+                      marginLeft: "-40px",
+                      zIndex: "3",
+                      cursor: "pointer",
+                    }}
+                    onClick={handleMicrophoneClick}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "16px" }}>
+                  <Button className="addBtn" onClick={handleDownload}>
+                    Download Template
+                  </Button>
+                  <Upload beforeUpload={() => false} onChange={handleUpload}>
+                    <Button className="archiveBtn">
+                      <FontAwesomeIcon
+                        size="lg"
+                        style={{ color: "#008162" }}
+                        icon={faFileArrowUp}
+                      />
+                      Bulk Upload
+                    </Button>
+                  </Upload>
+                  <Button className="addBtn" onClick={handleCreate}>
+                    Add Manufacturer
+                  </Button>
+                </div>
+              </div>
+              <Tabs className="table" activeKey={activeTab} onChange={setActiveTab}>
+                <TabPane tab="Live Manufacturers" key="live">
+                  <Table
+                    columns={createColumns(handleEdit)}
+                    dataSource={manufacturers}
+                    loading={loading}
+                    rowKey="_id"
+                    pagination={{ position: ["bottomCenter"] }}
+                  />
+                </TabPane>
+                <TabPane tab="Archived Manufacturers" key="archived">
+                  <Table
+                    columns={createColumns(
+                      handleEdit,
+                      handleDelete,
+                      handleUnarchive
+                    )}
+                    dataSource={archivedManufacturers}
+                    rowSelection={rowSelection}
+                    loading={loading}
+                    rowKey="_id"
+                    pagination={{ position: ["bottomCenter"] }}
+                  />
+                  <Button
+                    type="primary"
+                    className="spaced archiveBtn"
+                    onClick={handleBulkUnarchive}
+                    style={{ marginTop: "20px" }}
+                    disabled={selectedRows.length === 0}
+                  >
+                    Unarchive Selected
+                  </Button>
+                </TabPane>
+              </Tabs>
+            </div>
+          </div>
+        </Flex>
+      )}
+      <ManufacturerModal
+        isVisible={isModalVisible}
+        editingManufacturer={editingManufacturer}
+        onCancel={() => setIsModalVisible(false)}
+        onOk={handleOk}
+      />
+    </>
   );
 };
 
@@ -462,19 +475,6 @@ const ManufacturerModal = ({
     </Form>
   </Modal>
 );
-
-ManufacturerStats.propTypes = {
-  manufacturerCount: PropTypes.number.isRequired,
-  activeManufacturerCount: PropTypes.number.isRequired,
-  inactiveManufacturerCount: PropTypes.number.isRequired,
-};
-
-ManufacturerActions.propTypes = {
-  handleDownload: PropTypes.func.isRequired,
-  handleUpload: PropTypes.func.isRequired,
-  handleCreate: PropTypes.func.isRequired,
-  handleSearch: PropTypes.func.isRequired,
-};
 
 ManufacturerModal.propTypes = {
   isVisible: PropTypes.bool.isRequired,

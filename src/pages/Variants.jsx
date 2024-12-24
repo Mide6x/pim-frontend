@@ -165,10 +165,10 @@ const ManageVariants = () => {
   ];
 
   return (
-    <Flex vertical flex={1} className="content">
+    <Flex vertical flex={1} className="fullcontent">
       <div className="intro">
         <h2>Manage Variants</h2>
-        <p className="aboutPage" style={{ marginBottom: "10px" }}>
+        <p className="aboutPage">
           Create custom variants to provide more product information
         </p>
         <div className="searchBarContainer">
@@ -194,6 +194,7 @@ const ManageVariants = () => {
           </Button>
         </div>
       </div>
+      
       <div className="details">
         <Table
           columns={columns}

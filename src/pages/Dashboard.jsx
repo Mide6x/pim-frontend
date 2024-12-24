@@ -58,7 +58,7 @@ const Dashboard = () => {
       if (search) {
         const fuse = new Fuse(fetchedProducts, {
           keys: ["productName", "brand", "manufacturerName", "productCategory"],
-          threshold: 0.3, // Adjust the threshold as needed
+          threshold: 0.3, 
         });
         const results = fuse.search(search).map((result) => result.item);
         setProducts(results);
@@ -271,8 +271,7 @@ const Dashboard = () => {
   return (
     <>
       {userData && (
-        <Flex vertical flex={1} className="content">
-          <div>
+        <Flex vertical flex={1} className="fullcontent">
             <div className="intro">
               <h2>Dashboard </h2>
 
@@ -381,7 +380,6 @@ const Dashboard = () => {
                 pagination={{ position: ["bottomCenter"] }}
               />
             </div>
-          </div>
           <Modal
             title={editingProduct ? "Edit Product" : "Create Product"}
             open={isModalVisible}

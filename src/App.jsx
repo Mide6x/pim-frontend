@@ -30,10 +30,9 @@ const App = () => {
 
   return (
      <div className={isAuthPage ? "authbody" : "container"}>
-      {!isAuthPage && <Sidebar />}
+       {!isAuthPage && <Sidebar />}
       <div className={isAuthPage ? "" : "fullcontent"}>
         {!isAuthPage && <Topbar />}
-        <div className={isAuthPage ? "" : "content"}>
           <Routes>
             <Route
               path="/"
@@ -88,7 +87,6 @@ const App = () => {
           </Routes>
         </div>
       </div>
-    </div>
   );
 };
 

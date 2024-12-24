@@ -172,7 +172,7 @@ const ManufacturerDetails = () => {
   ];
 
   return (
-    <div className="content">
+    <div className="fullcontent">
       <div className="intro">
         <Button
           icon={<ArrowLeftOutlined />}

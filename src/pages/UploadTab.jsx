@@ -272,7 +272,7 @@ const UploadTab = () => {
   return (
     <>
       {userData && (
-        <Flex vertical flex={1} className="content">
+        <Flex vertical flex={1} className="fullcontent">
           <div>
             <div className="intro">
               <h2>Data Cleaning</h2>

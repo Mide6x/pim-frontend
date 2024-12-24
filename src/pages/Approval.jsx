@@ -347,7 +347,7 @@ const Approval = () => {
   ];
 
   return (
-    <Flex vertical flex={1} className="content">
+    <Flex vertical flex={1} className="fullcontent">
       <div>
         <div className="intro">
           <h2>Approvals</h2>

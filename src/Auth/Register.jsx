@@ -17,7 +17,7 @@ const Register = () => {
         <Flex gap="large" align="center">
           <Flex vertical flex={1}>
             <Typography.Title level={3} strong className="title">
-              Welcome Pookie, let&apos;s create an account for you! 🎉
+              Welcome, let&apos;s create an account for you!
             </Typography.Title>
             <Typography.Text type="secondary" strong className="slogan">
               if you&apos;re here, I assume you work in Sabi.

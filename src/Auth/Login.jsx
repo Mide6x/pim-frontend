@@ -20,7 +20,7 @@ const Login = () => {
           </div>
           <div style={{ flex: 1 }}>
             <Typography.Title level={3} strong className="title">
-              Let&apos;s get you logged in! 😤
+              Let&apos;s get you logged in!
             </Typography.Title>
             <Typography.Text type="secondary" strong className="slogan">
               If you&apos;re here, I assume you work at Sabi.
